@@ -220,6 +220,10 @@ GitHub gets **no stored AWS keys**. It signs in to AWS with OIDC, which issues s
 
 ```bash
 export GH_REPO=$(gh api user --jq .login)/Searchable_KB
+# GitHub's OIDC subject includes immutable owner and repo IDs, e.g. repo:owner@123/name@456
+# This lookup needs the repo to exist, so run the `gh repo create` line further down first.
+export GH_SUB=$(gh api repos/$GH_REPO/actions/oidc/customization/sub --jq .sub_claim_prefix)
+echo $GH_SUB
 
 aws iam create-open-id-connect-provider \
   --url https://token.actions.githubusercontent.com \
@@ -235,7 +239,7 @@ cat > /tmp/github-trust.json <<EOF
     "Condition": {
       "StringEquals": {
         "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-        "token.actions.githubusercontent.com:sub": "repo:${GH_REPO}:ref:refs/heads/main"
+        "token.actions.githubusercontent.com:sub": "${GH_SUB}:ref:refs/heads/main"
       }
     }
   }]

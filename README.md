@@ -30,6 +30,12 @@ Or call the API directly:
 curl "https://wtzpij76fw4cfysmikyhfg3kti0vmnvv.lambda-url.us-west-2.on.aws/api/search?q=got+a+new+phone+and+cant+approve+sign+ins"
 ```
 
+## How embeddings work
+
+An embedding model turns a piece of text into a list of numbers, called a vector, that captures what the text means. Searchable KB uses `bge-small-en-v1.5`, which turns any text into 384 numbers. The model was trained on huge amounts of text so that sentences with similar meanings end up with similar numbers, even when they share no words. "Can't log in" and "account locked after too many password attempts" land close together, while "printer jam" lands far away.
+
+Searching then becomes a geometry problem. Every entry is embedded once when it's indexed. When you search, your query is embedded with the same model, and each entry is scored by **cosine similarity**, which measures how closely two vectors point in the same direction. A score near 1 means very similar meaning; a score near 0 means unrelated. The entries with the highest scores are your results.
+
 ## How it's built
 
 | Piece | Built with |
@@ -63,13 +69,9 @@ Ingest embeds each entry's title and body together, because the title carries th
 
 ## Future plans
 
-- **Hybrid ranking.** Combine a BM25 keyword score with the vector score, so exact terms like "Wi-Fi" or an error code count alongside meaning.
-- **Chunking long entries.** Split long articles into sections and embed each one, so a search can land on the exact section that answers it.
-- **A dedicated vector index.** Move the embeddings into OpenSearch k-NN or pgvector, so search stays fast at tens of thousands of entries.
-- **Instant index refresh across instances.** Stamp each index build with a version and check it on every request, so all Lambda instances pick up a new ingest right away.
-- **An admin page for entries.** Add, edit and re-ingest knowledge base articles from the browser instead of syncing files to S3.
-- **Search feedback.** Let users mark a result as helpful, then use those signals to spot missing articles and tune ranking.
-- **Secrets in SSM Parameter Store.** Move the ingest token out of an environment variable and into a managed secret store.
+- **Hybrid ranking.** Combine a keyword score with the meaning score, so exact terms like "Wi-Fi" or an error code also count.
+- **An admin page.** Add and edit articles from the browser, then re-index them with one click.
+- **Search feedback.** Let users mark a result as helpful, to spot missing articles and improve ranking.
 
 <details>
 <summary><strong>Running Searchable KB yourself</strong></summary>
