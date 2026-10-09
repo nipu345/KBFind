@@ -61,14 +61,15 @@ Ingest embeds each entry's title and body together, because the title carries th
 - **Brute-force cosine similarity.** With a few dozen entries, one matrix multiply is instant and needs no extra infrastructure.
 - **OIDC for GitHub Actions.** The workflow assumes an AWS role that only this repo's `main` branch can use, so no long-lived AWS keys are stored in GitHub.
 
-## Limitations and what I'd change at scale
+## Future plans
 
-- **Semantic search is overkill at this size.** With 15 entries, keyword search plus a synonym list would do. Semantic search starts to pay off at thousands of entries written by many different authors.
-- **Pure vector search misses some obvious matches.** "laptop won't connect to wifi" doesn't surface the 802.1X wireless entry, because that entry says "wireless" and never "Wi-Fi", and a small model doesn't strongly link the two. Hybrid ranking (a BM25 keyword score plus the vector score) would fix this kind of miss.
-- **One vector per entry.** Long entries would need to be split into chunks, so a match on one section isn't diluted by the rest of the entry.
-- **Full scan of DynamoDB on cold start.** Fine for hundreds of entries. Beyond that, the vectors belong in a vector index such as OpenSearch k-NN or pgvector.
-- **Stale index across Lambda instances.** Each warm instance caches the index in memory, so after an ingest, other instances serve old results until they're recycled. A version stamp checked on each request would fix it.
-- **The ingest token lives in an environment variable.** That's fine for a demo. A production setup would read it from SSM Parameter Store or Secrets Manager.
+- **Hybrid ranking.** Combine a BM25 keyword score with the vector score, so exact terms like "Wi-Fi" or an error code count alongside meaning.
+- **Chunking long entries.** Split long articles into sections and embed each one, so a search can land on the exact section that answers it.
+- **A dedicated vector index.** Move the embeddings into OpenSearch k-NN or pgvector, so search stays fast at tens of thousands of entries.
+- **Instant index refresh across instances.** Stamp each index build with a version and check it on every request, so all Lambda instances pick up a new ingest right away.
+- **An admin page for entries.** Add, edit and re-ingest knowledge base articles from the browser instead of syncing files to S3.
+- **Search feedback.** Let users mark a result as helpful, then use those signals to spot missing articles and tune ranking.
+- **Secrets in SSM Parameter Store.** Move the ingest token out of an environment variable and into a managed secret store.
 
 <details>
 <summary><strong>Running Searchable KB yourself</strong></summary>
