@@ -16,8 +16,8 @@ A semantic search service for IT support knowledge bases. Knowledge bases usuall
 - **The top three matches, with sources.** Each result shows its title, tags, a similarity score and the file it came from, so you can check where the answer came from. Expand any result to read the full entry.
 - **A plain HTTP API.** `GET /api/search?q=...&k=3` returns the best k matches (up to 10) as JSON, along with how long the search took.
 - **Re-indexing in one request.** `POST /api/ingest` reads every markdown entry, embeds it and rebuilds the index. In production it requires a secret token, so not just anyone with the URL can trigger it.
-- **15 sample entries** in [`kb/`](kb/), covering problems like account lockouts, VPN issues, MFA re-enrollment and print queues. They're fictional, written for this project.
-
+- **15 sample entries** in [`kb/`](kb/), covering problems like account lockouts, VPN issues, MFA re-enrollment and print queues. They're fictional, written for this project - Working on updating existing cases!
+  
 ## How to use it
 
 1. **Open the [live site](https://wtzpij76fw4cfysmikyhfg3kti0vmnvv.lambda-url.us-west-2.on.aws/).**
