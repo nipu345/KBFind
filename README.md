@@ -49,7 +49,7 @@ Ingest embeds each entry's title and body together, because the title carries th
 ## Design decisions
 
 - **fastembed instead of sentence-transformers.** It avoids PyTorch, which keeps the image around 700 MB instead of several GB and makes Lambda cold starts shorter.
-- **Model baked into the image.** Lambda can only write to /tmp, and downloading the model on every cold start would add seconds. The app loads it with `local_files_only`.
+- **Model baked into the image.** Lambda can only write to /tmp, and downloading the model on every cold start would add seconds. The app loads it with local_files_only.
 - **Lambda Web Adapter instead of a Lambda-specific handler.** The container is a normal uvicorn web server, so the same image runs on a laptop and in Lambda.
 - **Lambda and a Function URL.** Traffic is occasional, so paying per request beats paying hourly for a load balancer or an always-on container.
 - **Brute-force cosine similarity.** With a few dozen entries, one matrix multiply is instant and needs no extra infrastructure.
@@ -60,6 +60,7 @@ Ingest embeds each entry's title and body together, because the title carries th
 - **Hybrid ranking.** Combine a keyword score with the meaning score, so exact terms like "Wi-Fi" or an error code also count.
 - **An admin page.** Add and edit articles from the browser, then re-index them with one click.
 - **Search feedback.** Let users mark a result as helpful, to spot missing articles and improve ranking.
+- **Pitch KBFind to CU Boulder OIT.** Offer it as an extra search option alongside OIT’s existing knowledge base, so staff can also search by meaning when they don’t know an article’s exact wording.
 
 <details>
 <summary><strong>Running KBFind yourself</strong></summary>
