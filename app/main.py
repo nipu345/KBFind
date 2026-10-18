@@ -18,7 +18,7 @@ def create_app(settings: Settings | None = None, store=None, embedder=None) -> F
     store = store or make_store(settings)
     embedder = embedder or Embedder(settings.model_name, settings.model_cache_dir, settings.model_offline)
 
-    app = FastAPI(title="Searchable KB")
+    app = FastAPI(title="KBFind")
     # Cached per process. On Lambda each warm instance holds its own copy, so an
     # instance that didn't handle the ingest keeps serving the old index until it's recycled.
     state: dict[str, SearchIndex | None] = {"index": None}

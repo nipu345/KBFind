@@ -1,4 +1,4 @@
-# Deploying Searchable KB
+# Deploying KBFind
 
 Every step is an AWS CLI command so each resource is created on purpose and can be explained. Run them in **one terminal window** so the variables from step 0 stay set. If you open a new terminal, re-run step 0.
 
@@ -28,7 +28,7 @@ The account is on the AWS **Free plan**. Nothing is charged to a card on that pl
 ## 0. Variables
 
 ```bash
-cd ~/Searchable_KB
+cd ~/KBFind
 export AWS_REGION=us-west-2
 export ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 export APP=searchable-kb
@@ -60,8 +60,8 @@ open http://localhost:8000
 ## 2. Run it in Docker locally
 
 ```bash
-docker build -t searchable-kb:local .
-docker run --rm -p 8080:8080 --read-only --tmpfs /tmp searchable-kb:local
+docker build -t kbfind:local .
+docker run --rm -p 8080:8080 --read-only --tmpfs /tmp kbfind:local
 ```
 
 `--read-only --tmpfs /tmp` imitates Lambda, where everything except `/tmp` is read-only. If the app tries to write anywhere else, it breaks here instead of in AWS.
@@ -219,7 +219,7 @@ aws logs put-retention-policy --log-group-name /aws/lambda/$APP --retention-in-d
 GitHub gets **no stored AWS keys**. It signs in to AWS with OIDC, which issues short-lived credentials to one repo's main branch only.
 
 ```bash
-export GH_REPO=$(gh api user --jq .login)/Searchable_KB
+export GH_REPO=$(gh api user --jq .login)/KBFind
 # GitHub's OIDC subject includes immutable owner and repo IDs, e.g. repo:owner@123/name@456
 # This lookup needs the repo to exist, so run the `gh repo create` line further down first.
 export GH_SUB=$(gh api repos/$GH_REPO/actions/oidc/customization/sub --jq .sub_claim_prefix)
@@ -281,9 +281,9 @@ Create the repo, set the secret **before** the first push, then push:
 ```bash
 git init -b main
 git add .
-git commit -m "Searchable KB: semantic search over IT knowledge base entries"
+git commit -m "KBFind: semantic search over IT knowledge base entries"
 
-gh repo create Searchable_KB --public --source . --remote origin
+gh repo create KBFind --public --source . --remote origin
 gh secret set AWS_DEPLOY_ROLE_ARN --body "arn:aws:iam::${ACCOUNT_ID}:role/$APP-github-deploy"
 git push -u origin main
 gh run watch
