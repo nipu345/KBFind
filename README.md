@@ -4,9 +4,9 @@ September 2026
 
 Python · FastAPI · fastembed · NumPy · Docker · AWS Lambda · S3 · DynamoDB · GitHub Actions
 
-A semantic search service for IT support knowledge bases. Knowledge bases usually already contain the answer, but people can't find it, because keyword search only works if you type the same words the author used. Someone types "can't log in", but the entry is titled "Account Lockout Remediation via Identity Management Portal". Searchable KB turns every entry into an embedding with a sentence-embedding model and ranks entries by meaning, so describing the problem in plain language finds the entry that fixes it. It runs as a container on AWS Lambda and redeploys automatically on every push to `main`.
+A semantic search service for IT support knowledge bases. Knowledge bases usually already contain the answer, but people can't find it, because keyword search only works if you type the same words the author used. Someone types "can't log in", but the entry is titled "Account Lockout Remediation via Identity Management Portal". KBFind turns every entry into an embedding with a sentence-embedding model and ranks entries by meaning, so describing the problem in plain language finds the entry that fixes it. It runs as a container on AWS Lambda and redeploys automatically on every push to `main`.
 
-**[Try it live → Searchable KB on AWS Lambda](https://wtzpij76fw4cfysmikyhfg3kti0vmnvv.lambda-url.us-west-2.on.aws/)**
+**[Try it live → KBFind on AWS Lambda](https://wtzpij76fw4cfysmikyhfg3kti0vmnvv.lambda-url.us-west-2.on.aws/)**
 
 > The service runs on Lambda, which shuts down idle containers. If nobody has searched in a while, the first search can take a few seconds while the container starts and loads the model. After that, searches are fast.
 
@@ -20,7 +20,7 @@ A semantic search service for IT support knowledge bases. Knowledge bases usuall
 
 ## How embeddings work
 
-An embedding model turns a piece of text into a list of numbers, called a vector, that captures what the text means. Searchable KB uses `bge-small-en-v1.5`, which turns any text into 384 numbers. The model was trained on huge amounts of text so that sentences with similar meanings end up with similar numbers, even when they share no words. "Can't log in" and "account locked after too many password attempts" land close together, while "printer jam" lands far away.
+An embedding model turns a piece of text into a list of numbers, called a vector, that captures what the text means. KBFind uses `bge-small-en-v1.5`, which turns any text into 384 numbers. The model was trained on huge amounts of text so that sentences with similar meanings end up with similar numbers, even when they share no words. "Can't log in" and "account locked after too many password attempts" land close together, while "printer jam" lands far away.
 
 Searching then becomes a geometry problem. Every entry is embedded once when it's indexed. When you search, your query is embedded with the same model, and each entry is scored by **cosine similarity**, which measures how closely two vectors point in the same direction. A score near 1 means very similar meaning; a score near 0 means unrelated. The entries with the highest scores are your results.
 
@@ -62,7 +62,7 @@ Ingest embeds each entry's title and body together, because the title carries th
 - **Search feedback.** Let users mark a result as helpful, to spot missing articles and improve ranking.
 
 <details>
-<summary><strong>Running Searchable KB yourself</strong></summary>
+<summary><strong>Running KBFind yourself</strong></summary>
 
 **Locally** (runs on port 8000)
 
