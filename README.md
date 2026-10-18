@@ -49,7 +49,7 @@ Ingest embeds each entry's title and body together, because the title carries th
 ## Design decisions
 
 - **fastembed instead of sentence-transformers.** It avoids PyTorch, which keeps the image around 700 MB instead of several GB and makes Lambda cold starts shorter.
-- **Model baked into the image.** Lambda can only write to `/tmp`, and downloading the model on every cold start would add seconds. The app loads it with `local_files_only`.
+- **Model baked into the image.** Lambda can only write to /tmp, and downloading the model on every cold start would add seconds. The app loads it with `local_files_only`.
 - **Lambda Web Adapter instead of a Lambda-specific handler.** The container is a normal uvicorn web server, so the same image runs on a laptop and in Lambda.
 - **Lambda and a Function URL.** Traffic is occasional, so paying per request beats paying hourly for a load balancer or an always-on container.
 - **Brute-force cosine similarity.** With a few dozen entries, one matrix multiply is instant and needs no extra infrastructure.
